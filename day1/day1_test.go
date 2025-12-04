@@ -64,14 +64,14 @@ func TestStartAt5RotateL10AndThenR5(t *testing.T) {
 
 func TestZeroCount(t *testing.T) {
 	game := NewPasswordBreakerGame()
-	game.PasswordBreaker("L50")
-	game.PasswordBreaker("L3")
-	game.PasswordBreaker("L97")
-	game.PasswordBreaker("R100")
+	game.PasswordBreaker("L50")  // hits 0
+	game.PasswordBreaker("L3")   // hits 97
+	game.PasswordBreaker("L97")  // hits 0
+	game.PasswordBreaker("R100") // hits 0
 	result := game.ZeroCount
 	expected := 3
 	if result != expected {
-		t.Errorf(`game.zeroCount should be 2 = %d, want %d`, result, expected)
+		t.Errorf(`game.zeroCount should be 3 = %d, want %d`, result, expected)
 	}
 }
 
@@ -112,15 +112,15 @@ func TestRealDataFirst10(t *testing.T) {
 	game := NewPasswordBreakerGame()
 
 	rotations := []string{
-		"R19",
-		"R5",
-		"R29",
-		"R30",
-		"L24",
-		"L12",
-		"R24",
-		"R2",
-		"R35",
+		"R19", // 69
+		"R5",  // 74
+		"R29", // 103 +1
+		"R30", // 133
+		"L24", // 109
+		"L12", // 97  +1
+		"R24", // 121 +1
+		"R2",  // 123
+		"R35", // 158
 		"L18",
 	}
 
@@ -133,8 +133,8 @@ func TestRealDataFirst10(t *testing.T) {
 		t.Errorf("final dial position = %d, want %d", pos, 40)
 	}
 
-	if game.ZeroCount != 0 {
-		t.Errorf("ZeroCount = %d, want %d", game.ZeroCount, 0)
+	if game.ZeroCount != 3 {
+		t.Errorf("ZeroCount = %d, want %d", game.ZeroCount, 3)
 	}
 }
 
@@ -265,5 +265,86 @@ func TestRight150WrapsToZero(t *testing.T) {
 
 	if game.ZeroCount != 1 {
 		t.Fatalf("ZeroCount = %d, want %d", game.ZeroCount, 1)
+	}
+}
+
+func TestCountZeroWhenPassesZero(t *testing.T) {
+	game := NewPasswordBreakerGame()
+	game.PasswordBreaker("L1000")
+
+	if game.ZeroCount != 10 {
+		t.Errorf("ZeroCount = %d, want %d", game.ZeroCount, 10)
+	}
+}
+
+func TestPart2ExampleCountsZeroDuringRotations(t *testing.T) {
+	game := NewPasswordBreakerGame()
+
+	rotations := []string{
+		"L68", // ends at 82 (+1: passes 0)
+		"L30", // ends at 52
+		"R48", // ends at 0 (+1: ends on 0)
+		"L5",  // ends at 95
+		"R60", // ends at 55 (+1: passes 0)
+		"L55", // ends at 0 (+1: ends on 0)
+		"L1",  // ends at 99
+		"L99", // ends at 0 (+1: ends on 0)
+		"R14", // ends at 14
+		"L82", // ends at 32 (+1: passes 0)
+	}
+
+	for _, r := range rotations {
+		game.PasswordBreaker(r)
+	}
+
+	if game.ZeroCount != 6 {
+		t.Fatalf("ZeroCount = %d, want %d", game.ZeroCount, 6)
+	}
+}
+
+func TestRight150From50HitsZeroTwice(t *testing.T) {
+	game := NewPasswordBreakerGame()
+
+	// From 50:
+	// R150 = 150 clicks to the right.
+	// - After 50 clicks, we hit 0 once.
+	// - After another 100 clicks (total 150), we land on 0 again.
+	//
+	// So:
+	// - Final position should be 0.
+	// - ZeroCount should be 2 (hit 0 twice in this single rotation).
+	pos := game.PasswordBreaker("R150")
+
+	if pos != 0 {
+		t.Fatalf(`PasswordBreaker("R150") position = %d, want %d`, pos, 0)
+	}
+
+	if game.ZeroCount != 2 {
+		t.Fatalf(`PasswordBreaker("R150") ZeroCount = %d, want %d`, game.ZeroCount, 2)
+	}
+}
+
+func TestLeftRotationCrossesZeroFromFive(t *testing.T) {
+	game := NewPasswordBreakerGame()
+
+	// Move from 50 to 5 without ever hitting 0:
+	// 50 L45 -> 5 (path: 49,48,...,5; never 0)
+	pos := game.PasswordBreaker("L45")
+	if pos != 5 {
+		t.Fatalf(`after "L45" position = %d, want %d`, pos, 5)
+	}
+	if game.ZeroCount != 0 {
+		t.Fatalf(`after "L45" ZeroCount = %d, want %d`, game.ZeroCount, 0)
+	}
+
+	// Now from 5:
+	// 5 L5 -> 0
+	// Clicks: 4,3,2,1,0 -> we should hit 0 exactly once.
+	pos = game.PasswordBreaker("L5")
+	if pos != 0 {
+		t.Fatalf(`after "L5" position = %d, want %d`, pos, 0)
+	}
+	if game.ZeroCount != 1 {
+		t.Fatalf(`after "L45","L5" ZeroCount = %d, want %d`, game.ZeroCount, 1)
 	}
 }
