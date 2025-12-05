@@ -12,7 +12,7 @@ func FindInvalidIds(idRange string) []int {
 	to, _ := strconv.Atoi(splitIdRange[1])
 
 	for i := from; i <= to; i++ { // 10
-		digits := convertIntToArray(i)
+		digits := ConvertIntToArray(i)
 		var lastDigit int
 		intString := strconv.Itoa(i)
 		intLength := len(intString)
@@ -88,7 +88,7 @@ func checkNumberSymmetry(number string, length int) bool {
 	return startRange == endRange
 }
 
-func convertIntToArray(i int) []int {
+func ConvertIntToArray(i int) []int {
 	digits := []int{}
 	for _, ch := range strconv.Itoa(i) {
 		digits = append(digits, int(ch-'0'))

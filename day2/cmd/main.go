@@ -23,10 +23,10 @@ func main() {
 		}
 		result = append(result, day2.FindInvalidIds(line)...)
 	}
-	fmt.Println(sumInts(result))
+	fmt.Println(SumInts(result))
 }
 
-func sumInts(nums []int) int {
+func SumInts(nums []int) int {
 	total := 0
 	for _, n := range nums {
 		total += n

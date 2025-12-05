@@ -22,7 +22,7 @@ func NewPasswordBreakerGame() *PasswordBreakerGame {
 func (p *PasswordBreakerGame) PasswordBreaker(position string) int {
 	direction := position[0:1]
 	change := position[1:]
-	changeInt := convertStringToInt(change)
+	changeInt := ConvertStringToInt(change)
 
 	p.ZeroCount += zerosOnRotation(direction, p.currentPosition, changeInt)
 	p.currentPosition = findNextPosition(direction, p.currentPosition, changeInt)
@@ -61,7 +61,7 @@ func zerosOnRotation(direction string, start, delta int) int {
 	return 1 + (delta-first)/lockSize
 }
 
-func convertStringToInt(s string) int {
+func ConvertStringToInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
 		panic(err)

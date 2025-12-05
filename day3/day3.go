@@ -27,19 +27,32 @@ func MaxBankJoltage(bank string) int {
 }
 
 func MaxBankJoltagePt2(bank string) int {
-	best := 0
-	bestIndex := 0
-	var result []int
+	const k = 12
 
-	for i := 0; i < len(bank)-12; i++ {
-		check := int(bank[i] - '0')
-		if check > best {
-			best = check
-			bestIndex = i
-		}
+	if len(bank) <= k {
+		v, _ := strconv.Atoi(bank)
+		return v
 	}
-	valueStr := bank[bestIndex : bestIndex+12]
+
+	drop := len(bank) - k
+	stack := make([]byte, 0, len(bank))
+
+	for i := 0; i < len(bank); i++ {
+		c := bank[i]
+
+		for drop > 0 && len(stack) > 0 && c > stack[len(stack)-1] {
+			stack = stack[:len(stack)-1]
+			drop--
+		}
+
+		stack = append(stack, c)
+	}
+
+	if len(stack) > k {
+		stack = stack[:k]
+	}
+
+	valueStr := string(stack)
 	value, _ := strconv.Atoi(valueStr)
 	return value
-
 }
