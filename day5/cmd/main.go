@@ -10,6 +10,10 @@ import (
 )
 
 func main() {
+	if os.Args[1] == "pt2" {
+		fmt.Println(runPartTwo())
+	}
+
 	data, err := os.ReadFile("input.txt")
 
 	if err != nil {
@@ -24,6 +28,17 @@ func main() {
 	}
 
 	fmt.Println(SumInts(result))
+}
+
+func runPartTwo() []string {
+	data, err := os.ReadFile("input.txt")
+
+	if err != nil {
+		panic(err)
+	}
+
+	ranges, _ := SplitDatabase(string(data))
+	return day5.CheckFoodIsFreshPt2(ranges)
 }
 
 func SplitDatabase(input string) ([]string, []string) {
